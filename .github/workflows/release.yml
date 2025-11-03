@@ -1,0 +1,44 @@
+name: Release
+
+on:
+    push:
+        tags:
+            - "v*"
+
+jobs:
+    release:
+        runs-on: windows-latest
+        permissions:
+            contents: write
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.13"
+                  cache: "pip"
+
+            - name: Install dependencies
+              run: |
+                  python -m pip install --upgrade pip
+                  pip install -r requirements.txt
+
+            - name: Build executable
+              run: |
+                  python -m PyInstaller --clean GamingLog.spec
+
+            - name: Generate checksum
+              run: |
+                  Get-FileHash dist/GamingLog.exe -Algorithm SHA256 | Select-Object Hash | Out-File -FilePath dist/GamingLog.exe.sha256 -Encoding utf8
+
+            - name: Create Release
+              uses: softprops/action-gh-release@v2
+              with:
+                  files: |
+                      dist/GamingLog.exe
+                      dist/GamingLog.exe.sha256
+                  generate_release_notes: true
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
