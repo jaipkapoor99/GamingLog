@@ -29,6 +29,32 @@ jobs:
               run: |
                   python -m PyInstaller --clean GamingLog.spec
 
+            - name: Create example configuration files
+              run: |
+                  @"
+                  # Google Service Account credentials JSON file path
+                  GOOGLE_SERVICE_ACCOUNT_FILE=C:\path\to\your\credentials.json
+
+                  # Google Sheet ID (find in the sheet URL)
+                  GOOGLE_SHEET_ID=your_sheet_id_here
+
+                  # Optional: Poll interval in seconds (default: 5)
+                  POLL_INTERVAL_SECONDS=5
+                  "@ | Out-File -FilePath dist/.env.example -Encoding utf8
+
+                  @"
+                  # GamingLog Configuration Guide
+
+                  Before running GamingLog.exe, you need to:
+
+                  1. Rename `.env.example` to `.env`
+                  2. Add your Google Sheets credentials
+                  3. Update GOOGLE_SHEET_ID with your sheet ID
+                  4. Place your `credentials.json` file in the same folder
+
+                  See README.md for full setup instructions.
+                  "@ | Out-File -FilePath dist/SETUP.txt -Encoding utf8
+
             - name: Generate checksum
               run: |
                   Get-FileHash dist/GamingLog.exe -Algorithm SHA256 | Select-Object Hash | Out-File -FilePath dist/GamingLog.exe.sha256 -Encoding utf8
@@ -39,6 +65,8 @@ jobs:
                   files: |
                       dist/GamingLog.exe
                       dist/GamingLog.exe.sha256
+                      dist/.env.example
+                      dist/SETUP.txt
                   generate_release_notes: true
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

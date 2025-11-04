@@ -83,21 +83,41 @@ python -m PyInstaller --clean GamingLog.spec
 
 This creates `dist/GamingLog.exe`.
 
-### 6. Copy Environment File
+### 6. Prepare the Distribution Folder
 
-The executable needs the `.env` file in the same directory:
+Copy required files to the `dist` folder:
 
 ```powershell
+# Copy environment configuration
 Copy-Item .env .\dist\.env -Force
+
+# Copy credentials file
+Copy-Item credentials.json .\dist\credentials.json -Force
 ```
 
-### 7. Install Auto-Start Task
+**Important:** Update the `.env` file in the `dist` folder to use the local credentials path:
+
+```env
+GOOGLE_SERVICE_ACCOUNT_FILE=C:\Coding\GamingLog\dist\credentials.json
+GOOGLE_SHEET_ID=your_sheet_id_here
+POLL_INTERVAL_SECONDS=5
+```
+
+### 7. Run GamingLog
+
+Simply run the executable:
 
 ```powershell
-.\dist\GamingLog.exe --install-task
+.\dist\GamingLog.exe
 ```
 
-This creates a startup script in:
+**That's it!** The program will:
+
+- ✅ Automatically install itself to Windows Startup folder on first run
+- ✅ Start monitoring in the background
+- ✅ Begin logging gaming sessions to Google Sheets
+
+The executable auto-installs to:
 
 ```text
 C:\Users\[USERNAME]\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\GamingLogWatcher.bat
@@ -105,23 +125,27 @@ C:\Users\[USERNAME]\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startu
 
 ## Usage
 
-### Commands
+### Quick Start
+
+Just run the executable - it handles everything automatically:
+
+```powershell
+.\dist\GamingLog.exe
+```
+
+On first run, it will install itself to Windows Startup and begin monitoring.
+
+### Manual Commands
 
 ```bash
-# Install auto-start on login
+# Install auto-start on login (optional - happens automatically)
 .\dist\GamingLog.exe --install-task
 
 # Uninstall auto-start
 .\dist\GamingLog.exe --uninstall-task
 
-# Check if task is installed
-.\dist\GamingLog.exe --task-exists
-
-# Start watcher manually
+# Start watcher manually in background
 .\dist\GamingLog.exe --run
-
-# Start task (same as --run)
-.\dist\GamingLog.exe --start-task
 ```
 
 ### Google Sheet Format
@@ -220,8 +244,20 @@ GamingLog/
 1. Update `main.py`
 2. Kill running processes: `taskkill /F /IM GamingLog.exe`
 3. Rebuild: `python -m PyInstaller --clean GamingLog.spec`
-4. Copy `.env`: `Copy-Item .env .\dist\.env -Force`
-5. Restart watcher: `.\dist\GamingLog.exe --run`
+4. Copy required files to dist:
+
+   ```powershell
+   Copy-Item .env .\dist\.env -Force
+   Copy-Item credentials.json .\dist\credentials.json -Force
+   ```
+
+5. Update `.env` in dist folder to point to local credentials:
+
+   ```env
+   GOOGLE_SERVICE_ACCOUNT_FILE=C:\Coding\GamingLog\dist\credentials.json
+   ```
+
+6. Restart watcher: `.\dist\GamingLog.exe`
 
 ## License
 

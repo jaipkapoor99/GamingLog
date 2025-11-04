@@ -23,7 +23,15 @@ from googleapiclient.discovery import build  # type: ignore[import-untyped]
 from googleapiclient.errors import HttpError  # type: ignore[import-untyped]
 
 # Load environment variables from .env file
-load_dotenv()
+# Look for .env in the same directory as the executable/script
+if getattr(sys, "frozen", False):
+    # Running as compiled executable
+    dotenv_path = Path(sys.executable).parent / ".env"
+else:
+    # Running as script
+    dotenv_path = Path(__file__).parent / ".env"
+
+load_dotenv(dotenv_path=dotenv_path)
 
 # ---- Constants ----
 SECONDS_TO_MINUTES: float = 60.0
