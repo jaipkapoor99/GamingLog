@@ -228,8 +228,8 @@ def detect_running_games_steam(
     library_common_dirs: List[str],
 ) -> Dict[int, Tuple[str, str]]:
     """Detect running games from Steam library directories.
-    Only tracks processes with memory > 2GB to avoid launcher processes."""
-    MIN_MEMORY_BYTES: int = 2 * 1024 * 1024 * 1024  # 2GB
+    Only tracks processes with memory > 1GB to avoid launcher processes."""
+    MIN_MEMORY_BYTES: int = 1 * 1024 * 1024 * 1024  # 1GB
     matches: Dict[int, Tuple[str, str]] = {}
     for p in psutil.process_iter(
         ["pid", "name", "exe", "memory_info"]
@@ -245,7 +245,7 @@ def detect_running_games_steam(
 
             exe_norm: str = os.path.normcase(os.path.normpath(exe_path))
             if any(exe_norm.startswith(lib) for lib in library_common_dirs):
-                # Only track processes with memory > 2GB (actual game, not
+                # Only track processes with memory > 1GB (actual game, not
                 # launcher)
                 memory_info = p.info.get("memory_info")
                 if memory_info and memory_info.rss >= MIN_MEMORY_BYTES:
